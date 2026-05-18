@@ -18,7 +18,7 @@ cluster-mode=2
 maintain-aspect-ratio=1
 # force-implicit-batch-dim=0 (disabled for explicit batch size)
 batch-size=16
-interval=2
+interval=4
 process-mode=1
 
 # Custom Parser Settings
