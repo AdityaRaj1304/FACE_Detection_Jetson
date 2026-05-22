@@ -23,4 +23,4 @@ __pycache__/
 # Node.js / Backend Service
 node_modules/
 .env
-./known_faces
+known_faces/
