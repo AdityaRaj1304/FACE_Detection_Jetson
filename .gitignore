@@ -18,4 +18,4 @@ nvdsinfer_custom_impl_Yolo/
 
 # Python caches
 __pycache__/
-*.pyc
+*.pyc   
