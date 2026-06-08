@@ -56,6 +56,7 @@ def init_db():
     """Initializes the local SQLite database buffer with student_name."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
+    cursor.execute('PRAGMA journal_mode=WAL;')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
