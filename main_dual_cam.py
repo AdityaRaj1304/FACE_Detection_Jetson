@@ -460,7 +460,7 @@ def create_source_bin(index, uri):
 
         # 640x480 to keep Nano GPU usage reasonable
         caps = Gst.Caps.from_string(
-            "video/x-raw(memory:NVMM), width=960, height=540, format=NV12")
+            "video/x-raw(memory:NVMM), width=640, height=480, format=NV12")
         capsfilter.set_property("caps", caps)
 
         Gst.Bin.add(nbin, v4l2src)
@@ -509,8 +509,8 @@ def main(args):
 
     # ---- Stream Muxer ---- #
     streammux = Gst.ElementFactory.make("nvstreammux", "Stream-muxer")
-    streammux.set_property('width', 960)
-    streammux.set_property('height', 540)
+    streammux.set_property('width', 640)
+    streammux.set_property('height', 480)
     streammux.set_property('batch-size', num_sources)
     streammux.set_property('live-source', 1)
     streammux.set_property('batched-push-timeout', MUXER_BATCH_TIMEOUT)
@@ -538,8 +538,8 @@ def main(args):
         'll-lib-file',
         '/opt/nvidia/deepstream/deepstream/lib/libnvds_nvmultiobjecttracker.so')
     tracker.set_property('ll-config-file', 'configs/tracker_config.yml')
-    tracker.set_property('tracker-width', 640)
-    tracker.set_property('tracker-height', 640)
+    tracker.set_property('tracker-width', 480)
+    tracker.set_property('tracker-height', 480)
 
     # ---- Secondary GIE (MobileFaceNet) ---- #
     print("Creating Secondary GIE (MobileFaceNet)...")
