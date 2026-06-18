@@ -1,50 +1,24 @@
-import { useState, useEffect } from 'react';
-import { Bell, Search } from 'lucide-react';
-import { getSocket } from '../socket';
-import './TopBar.css';
+import React from 'react';
 
-interface TopBarProps {
-  title: string;
-}
-
-export default function TopBar({ title }: TopBarProps) {
-  const [isConnected, setIsConnected] = useState(false);
-
-  useEffect(() => {
-    const socket = getSocket();
-    
-    const onConnect = () => setIsConnected(true);
-    const onDisconnect = () => setIsConnected(false);
-
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    setIsConnected(socket.connected);
-
-    return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-    };
-  }, []);
-
+export const TopBar: React.FC = () => {
   return (
-    <header className="topbar neu-convex">
-      <div className="topbar-left">
-        <h2 className="text-headline-md">{title}</h2>
+    <header className="fixed top-0 right-0 left-64 h-20 bg-surface z-40 flex items-center justify-between px-margin-desktop neumorphic-convex">
+      <div className="flex items-center gap-stack-md">
+        <span className="material-symbols-outlined text-primary text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>menu_open</span>
+        <h2 className="font-headline-md text-headline-md text-on-surface tracking-tighter">Warden&nbsp; Dashboard</h2>
       </div>
-      <div className="topbar-right">
-        <div className={`sync-badge neu-inset ${isConnected ? 'connected' : 'disconnected'}`}>
-          <div className={`sync-dot ${isConnected ? 'animate-pulse-glow' : ''}`} />
-          <span className="text-label-md">
-            {isConnected ? 'Live Sync' : 'Offline'}
-          </span>
+      <div className="flex items-center gap-stack-lg">
+        <div className="flex items-center gap-stack-sm px-stack-md py-unit rounded-full neumorphic-inset">
+          <div className="w-2 h-2 rounded-full bg-secondary-container glow-teal animate-pulse"></div>
+          <span className="font-label-md text-secondary">Live Sync</span>
         </div>
-        <button className="topbar-btn neu-convex" aria-label="Notifications">
-          <Bell size={20} />
+        <button className="neumorphic-convex p-stack-sm rounded-full text-on-surface-variant hover:text-primary transition-all active:scale-95">
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>notifications</span>
         </button>
-        <button className="topbar-btn neu-convex" aria-label="Search">
-          <Search size={20} />
+        <button className="neumorphic-convex p-stack-sm rounded-full text-on-surface-variant hover:text-primary transition-all active:scale-95">
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>search</span>
         </button>
       </div>
     </header>
   );
-}
+};

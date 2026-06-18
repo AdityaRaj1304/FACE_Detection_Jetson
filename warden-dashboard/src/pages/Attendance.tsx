@@ -1,171 +1,164 @@
-import { useState } from 'react';
-import { Search, Calendar, Filter, Download, CheckCircle, AlertTriangle, ShieldAlert, ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react';
-import TopBar from '../components/TopBar';
-import './Attendance.css';
-
-const MOCK_TRANSACTIONS = [
-  { id: 'TX01', type: 'success', resident: 'Alex Rivera', residentId: 'ID-88291-K', location: 'North Wing Entry 02', time: '14:22:08', date: 'Oct 24, 2023', verification: 'Biometric-Pass', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDho0UJiLK4UMfc5OLiAzCGp2E7zajNcXKlLxLRG3QrnGotTH_MrofP-4yNxNAHmvWyrdnkiU0tYIR_JjuxQ43sO1FWcCwaCOiAQfctJNRIkoSuWouXQKVwBCBDqox4lHnDegxq3PaOoWBWRK42i7z6SSql-evU0HuA2Wee9SEaS3NfGm4VPMmo8q9tig-SXkLVqUcNqPe7W3OkziTTQr910q4azbfR_-i8HfC7-rOqHoiN0hz6b0q8Q7M2mtVfR-ikaOCZtC97pzI' },
-  { id: 'TX02', type: 'anomaly', resident: 'Sarah Chen', residentId: 'ID-12904-X', location: 'Central Cafeteria', time: '13:58:12', date: 'Oct 24, 2023', verification: 'Double Entry Det.', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhrVPu7onvf_ZKWGmXtAMJMoEybkRVElAmSdvGC-ZiH72eDZm7X-YXkDIbj-QBqsUudZqK9VHIJUlEL1CSnv1Ko7ITsm7BmlCmeYRQ_KnhAfKyVPFv4qxTXpq43DdSJ2QLcKia0mJcMXKdRUNUU0ZX2MW8w1ihrGi6XBLhiW8r9PtFsFbF2IsoftpRcddY1x9uXzM8wgKa-PQeOzQe9YZSOzm19-qYO8KVw3UmC8OKOzl_kwnSYU0nt9-N1fVt_Cffp0fi0DRyhL8' },
-  { id: 'TX03', type: 'success', resident: 'Jordan Smyth', residentId: 'ID-99201-M', location: 'Main Gate West', time: '13:45:00', date: 'Oct 24, 2023', verification: 'RFID-Pass', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDtP-VOnqKnE_Ghz7A-15M-2t5buElLwlBtX_SHI8e35-2z1-kPJM-MTJrc32Hj4gunEG_D3FIs1CyAO1dX-yLnlIIlG2pFwEsPXpDVyY7aYeYp3l_D9bdajKmnfKWZ8atQt_LJoZF0yVVOec22HMjMrLUaz9J1XDRkw3esY6IN-9ymjm2-tN9fsRXJXMXhxA5wpGGwxIrWjgJHEm3s3vNCOKGTWIqhUqK8LN_ADY5YvCIlVlCleKryMKSlanKk69newo49tGtTSbg' },
-  { id: 'TX04', type: 'critical', resident: 'Unknown Subject', residentId: 'TOKEN-ERR-404', location: 'Staff Restricted Zone', time: '13:12:44', date: 'Oct 24, 2023', verification: 'UNAUTHORIZED', avatar: null },
-  { id: 'TX05', type: 'success', resident: 'Mia Wong', residentId: 'ID-77212-P', location: 'Residential Lift A', time: '12:50:11', date: 'Oct 24, 2023', verification: 'Biometric-Pass', avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBE_lunBO9OXLbB3T_WhncQ_4yOmCsGeHpzLgxaB2iTuR3cGUnEWhipn7nAoG2JnKpZILXek0lPwORb9h_0J1BIyiEx51QQOIIP93lteFNdyreNZQ3kDx9d0F5FZAKbpbgoXXTL591hjJ-fCfPFgNnTppzTzfSyniZsK-sJ58WSVR8NWJIIYfG-baFxBnQsrWEcMauvlAUFUxD0S5mAw0SRSqpfWNi7XAcsXeQHH4xLkcPXzaXlnDSKLAZX0pKeLk304YmLf6GVvRA' }
-];
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, AlertTriangle, Building, X, Plus } from 'lucide-react';
+import { io } from 'socket.io-client';
 
 export default function Attendance() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [logs, setLogs] = useState([
+    { id: 1, type: 'entry', title: 'Main Gate Entry', time: '08:42 AM', method: 'Biometric', alert: false },
+    { id: 2, type: 'building', title: 'Block A Entry', time: '09:15 AM', method: 'RFID', alert: false },
+    { id: 3, type: 'missing', title: 'Mess Exit Missing', time: 'Expected 02:00 PM', alert: true },
+  ]);
 
-  const getStatusIcon = (type: string) => {
-    switch (type) {
-      case 'success': return <CheckCircle size={16} className="text-secondary" />;
-      case 'anomaly': return <AlertTriangle size={16} className="text-tertiary" />;
-      case 'critical': return <ShieldAlert size={16} className="text-error" />;
-      default: return null;
-    }
-  };
+  useEffect(() => {
+    // Listen to real-time events just to show it's connected
+    const socket = io('http://localhost:3000');
+    
+    socket.on('new_attendance', (data) => {
+      console.log('Real-time attendance:', data);
+    });
+
+    socket.on('security_alert', (data) => {
+      console.log('Security alert:', data);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
-    <>
-      <TopBar title="Operational Overview" />
-      <div className="page-content attendance-page">
-        {/* Matrix Header Stats */}
-        <div className="stats-grid">
-          <div className="stat-card border-secondary glow-teal-edge">
-            <p className="stat-label">Daily Presence</p>
-            <h3 className="stat-value text-secondary">94.2%</h3>
-            <p className="stat-sub">+1.2% from yesterday</p>
+    <div className="flex flex-col min-h-screen pb-32">
+      {/* TopAppBar */}
+      <header className="w-full top-0 sticky z-50 bg-surface shadow-[6px_6px_16px_rgba(3,1,10,0.7),-6px_-6px_16px_rgba(42,30,92,0.25)] flex justify-between items-center px-margin-mobile py-4 mb-stack-lg">
+        <div className="flex items-center gap-stack-sm active:scale-95 transition-transform">
+          <div className="w-10 h-10 rounded-full border-2 border-primary overflow-hidden flex items-center justify-center filter drop-shadow-[0_0_6px_rgba(203,190,255,0.4)]">
+            <img alt="Student Profile Photo" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJASsb4wfTJZ6pSV5pqFIZviOP7Y6rL00HbpseAUxrzRkYMT6WXNadg5Lyzssh5cTdskJ8O7JhL-XmtTwoeODjbvf1bqE_Kjz4rCKfxVfIkva8g17IbpI_ca8zqGHIwpbrSGJnlKdlWuIPKlD4vKImyWo-zlQb2qBQt6dXI0YZ5ryC6ddmo6UMxFnJgWJccYkeKAtrGN8SeTb4J7YZgdiPlb8aZHiTW6nTtKs_G-aE8lJcl8ZpeznAa7-a8nM0_QddBGaA9ff3C84"/>
           </div>
-          <div className="stat-card border-tertiary glow-amber-edge">
-            <p className="stat-label">Anomalies Detected</p>
-            <h3 className="stat-value text-tertiary">07</h3>
-            <p className="stat-sub">Requires urgent review</p>
-          </div>
-          <div className="stat-card border-primary">
-            <p className="stat-label">Peak Entry Hour</p>
-            <h3 className="stat-value text-primary">08:14</h3>
-            <p className="stat-sub">Main Gate Primary</p>
-          </div>
-          <div className="stat-card border-outline">
-            <p className="stat-label">Total Transactions</p>
-            <h3 className="stat-value text-on-surface">1,284</h3>
-            <p className="stat-sub">Last 24 Hours</p>
+          <div className="flex flex-col">
+            <span className="font-headline-md text-[20px] font-bold text-primary tracking-tight">Student Presence</span>
           </div>
         </div>
+      </header>
 
-        {/* Filters Section */}
-        <div className="filters-section neu-convex">
-          <div className="search-bar neu-inset">
-            <Search size={18} className="text-outline" />
-            <input 
-              type="text" 
-              placeholder="Search resident, ID or biometric token..." 
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-          
-          <div className="filter-dropdown neu-inset">
-            <Calendar size={18} className="text-outline" />
-            <select>
-              <option>Today: Oct 24, 2023</option>
-              <option>Yesterday</option>
-              <option>Last 7 Days</option>
-            </select>
-          </div>
-
-          <div className="filter-dropdown neu-inset">
-            <Filter size={18} className="text-outline" />
-            <select>
-              <option>All Statuses</option>
-              <option>Success Only</option>
-              <option className="text-tertiary">Anomalies</option>
-              <option className="text-error">Access Denied</option>
-            </select>
-          </div>
-
-          <button className="download-btn neu-convex text-primary">
-            <Download size={20} />
-          </button>
-        </div>
-
-        {/* Table */}
-        <div className="table-container neu-high-lift">
-          <table className="attendance-table">
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Resident / ID</th>
-                <th>Access Point</th>
-                <th>Timestamp</th>
-                <th>Verification</th>
-                <th className="text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MOCK_TRANSACTIONS.map((tx) => (
-                <tr key={tx.id} className={`tx-row row-${tx.type}`}>
-                  <td>
-                    <div className="status-indicator">
-                      <div className={`status-line bg-${tx.type}`} />
-                      <div className="status-icon neu-inset">
-                        {getStatusIcon(tx.type)}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="resident-cell">
-                      <div className="resident-avatar neu-convex">
-                        {tx.avatar ? <img src={tx.avatar} alt="avatar" /> : <ShieldAlert size={20} className="text-outline" />}
-                      </div>
-                      <div>
-                        <p className={`text-body-md font-bold ${tx.type === 'critical' ? 'text-error' : 'text-on-surface'}`}>{tx.resident}</p>
-                        <p className="text-label-md text-outline" style={{ fontSize: '10px' }}>{tx.residentId}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="text-body-sm text-on-surface-variant">{tx.location}</span>
-                  </td>
-                  <td>
-                    <p className="text-body-sm text-on-surface">{tx.time}</p>
-                    <p className="text-label-md text-outline" style={{ fontSize: '10px' }}>{tx.date}</p>
-                  </td>
-                  <td>
-                    <span className={`verification-badge badge-${tx.type}`}>
-                      {tx.verification}
-                    </span>
-                  </td>
-                  <td className="text-right">
-                    {tx.type === 'success' ? (
-                      <button className="action-btn">
-                        <MoreVertical size={16} />
-                      </button>
-                    ) : (
-                      <button className={`resolve-btn btn-${tx.type} neu-convex`}>
-                        {tx.type === 'critical' ? 'Lockdown' : 'Resolve'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          
-          <div className="pagination">
-            <p className="text-body-sm text-on-surface-variant">Showing 1 - 25 of 1,284 transactions</p>
-            <div className="pagination-controls">
-              <button className="page-nav neu-convex" disabled><ChevronLeft size={18} /></button>
-              <div className="page-numbers">
-                <span className="page-num active neu-inset">1</span>
-                <span className="page-num">2</span>
-                <span className="page-num">3</span>
-                <span className="text-on-surface-variant">...</span>
-                <span className="page-num">52</span>
-              </div>
-              <button className="page-nav neu-convex"><ChevronRight size={18} /></button>
+      <main className="flex-1 px-margin-mobile max-w-4xl mx-auto w-full">
+        {/* Monthly Attendance Calendar */}
+        <section className="mb-stack-lg">
+          <div className="flex items-center justify-between mb-stack-md">
+            <h2 className="font-headline-md text-[24px] font-bold text-on-surface">May 2024</h2>
+            <div className="flex gap-stack-sm">
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-surface neu-convex active:neu-inset transition-all">
+                <ChevronLeft size={20} className="text-on-surface" />
+              </button>
+              <button className="w-8 h-8 rounded-lg flex items-center justify-center bg-surface neu-convex active:neu-inset transition-all">
+                <ChevronRight size={20} className="text-on-surface" />
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-    </>
+          
+          {/* Recessed Calendar Basin */}
+          <div className="bg-surface-container-low rounded-xl p-4 neu-inset">
+            <div className="grid grid-cols-7 gap-2 mb-4">
+              <div className="text-center font-label-md text-[12px] font-bold text-on-surface-variant">MO</div>
+              <div className="text-center font-label-md text-[12px] font-bold text-on-surface-variant">TU</div>
+              <div className="text-center font-label-md text-[12px] font-bold text-on-surface-variant">WE</div>
+              <div className="text-center font-label-md text-[12px] font-bold text-on-surface-variant">TH</div>
+              <div className="text-center font-label-md text-[12px] font-bold text-on-surface-variant">FR</div>
+              <div className="text-center font-label-md text-[12px] font-bold text-on-surface-variant">SA</div>
+              <div className="text-center font-label-md text-[12px] font-bold text-error">SU</div>
+            </div>
+            <div className="grid grid-cols-7 gap-2">
+              {/* Previous Month */}
+              <div className="h-10 flex items-center justify-center font-body-sm text-[14px] text-outline-variant opacity-30">29</div>
+              <div className="h-10 flex items-center justify-center font-body-sm text-[14px] text-outline-variant opacity-30">30</div>
+              
+              {/* Current Month: Present */}
+              {[1,2,3,4].map(day => (
+                <div key={day} className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] text-secondary-fixed-dim bg-surface neu-convex filter drop-shadow-[0_0_4px_rgba(0,223,197,0.5)] border border-secondary-fixed-dim/20">{day}</div>
+              ))}
+              <div className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] text-on-surface-variant opacity-50">5</div>
+              
+              {[6,7].map(day => (
+                <div key={day} className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] text-secondary-fixed-dim bg-surface neu-convex filter drop-shadow-[0_0_4px_rgba(0,223,197,0.5)] border border-secondary-fixed-dim/20">{day}</div>
+              ))}
+              
+              {/* Absent */}
+              <div className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] text-tertiary-fixed-dim bg-surface-container-high filter drop-shadow-[0_0_4px_rgba(255,185,95,0.5)] border border-tertiary/20">8</div>
+              
+              {[9,10,11].map(day => (
+                <div key={day} className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] text-secondary-fixed-dim bg-surface neu-convex filter drop-shadow-[0_0_4px_rgba(0,223,197,0.5)] border border-secondary-fixed-dim/20">{day}</div>
+              ))}
+              <div className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] text-on-surface-variant opacity-50">12</div>
+              
+              {/* Current Day Recessed */}
+              <div className="h-10 rounded-lg flex items-center justify-center font-body-sm text-[14px] font-bold text-primary neu-inset bg-surface-container-highest border border-primary/30">13</div>
+              
+              {/* Future */}
+              {[14,15,16,17,18].map(day => (
+                <div key={day} className="h-10 flex items-center justify-center font-body-sm text-[14px] text-on-surface-variant">{day}</div>
+              ))}
+              <div className="h-10 flex items-center justify-center font-body-sm text-[14px] text-on-surface-variant opacity-50">19</div>
+              {[20,21,22,23,24,25].map(day => (
+                <div key={day} className="h-10 flex items-center justify-center font-body-sm text-[14px] text-on-surface-variant">{day}</div>
+              ))}
+              <div className="h-10 flex items-center justify-center font-body-sm text-[14px] text-on-surface-variant opacity-50">26</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Daily Log List */}
+        <section className="mb-stack-lg">
+          <div className="flex items-center justify-between mb-stack-md">
+            <h2 className="font-headline-md text-[20px] font-bold text-on-surface">Recent Logs</h2>
+            <button className="font-label-md text-[12px] font-bold text-primary uppercase tracking-widest hover:opacity-80">View All</button>
+          </div>
+          
+          <div className="flex flex-col gap-4">
+            {logs.map((log) => (
+              <div key={log.id} className={`p-4 bg-surface rounded-xl neu-convex flex items-center gap-4 transition-transform active:scale-95 ${log.alert ? 'border-l-4 border-tertiary' : ''}`}>
+                <div className={`w-12 h-12 rounded-full neu-inset bg-surface-container-low flex items-center justify-center ${log.alert ? 'text-tertiary filter drop-shadow-[0_0_4px_rgba(255,185,95,0.5)]' : 'text-secondary'}`}>
+                  {log.type === 'entry' ? (
+                    <span className="material-symbols-outlined">gate</span>
+                  ) : log.type === 'building' ? (
+                    <Building size={24} />
+                  ) : (
+                    <X size={24} />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-body-md text-[16px] font-semibold text-on-surface">{log.title}</p>
+                  <p className="font-label-md text-[12px] text-on-surface-variant mt-1">{log.time}{log.method ? ` • ${log.method}` : ''}</p>
+                </div>
+                {log.alert ? (
+                  <button className="px-3 py-2 rounded-lg bg-tertiary text-on-tertiary font-label-md text-[10px] font-bold active:neu-inset transition-all">
+                    RAISE DISPUTE
+                  </button>
+                ) : (
+                  <button className="p-2 rounded-lg bg-surface neu-inset text-primary hover:text-secondary-fixed transition-colors">
+                    <AlertTriangle size={20} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Stats/Insight Summary */}
+        <section className="grid grid-cols-2 gap-gutter">
+          <div className="p-4 bg-surface rounded-xl neu-inset flex flex-col items-center">
+            <span className="text-secondary font-headline-md text-[32px] font-bold filter drop-shadow-[0_0_4px_rgba(0,223,197,0.5)]">94%</span>
+            <span className="text-on-surface-variant font-label-md text-[10px] font-bold uppercase mt-1">Attendance</span>
+          </div>
+          <div className="p-4 bg-surface rounded-xl neu-inset flex flex-col items-center">
+            <span className="text-tertiary font-headline-md text-[32px] font-bold filter drop-shadow-[0_0_4px_rgba(255,185,95,0.5)]">2</span>
+            <span className="text-on-surface-variant font-label-md text-[10px] font-bold uppercase mt-1">Pending Disputes</span>
+          </div>
+        </section>
+      </main>
+
+      {/* FAB for 'Report Missing Mark' */}
+      <button className="fixed bottom-24 right-6 w-14 h-14 rounded-full bg-primary-container text-on-primary-container neu-high-lift active:neu-inset active:scale-90 transition-all z-40 flex items-center justify-center">
+        <Plus size={32} />
+      </button>
+    </div>
   );
 }

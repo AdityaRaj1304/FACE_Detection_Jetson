@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Video, Grid, Maximize, Circle, Camera } from 'lucide-react';
-import TopBar from '../components/TopBar';
-import './Surveillance.css';
 
 const cameras = [
   { id: 'CAM_01_ENTRANCE', name: 'Entrance', fps: 60, status: 'LIVE', res: '1080p', error: false, image: 'https://lh3.googleusercontent.com/aida/AP1WRLv7Vi7UJgx2dCiVtfWYnrNRx9DDwQHYP65Ww9YBuEhX2T0XEegD-DeHys7x_hEDzPLpCOztBFfFEzdOlIlhQcjZ6HiAat7EmBEQ28bL5QyW7ZDsys7phC6WCmzQhCGJAu5FwwLRDSAXTOD6Xmew1PRVr3Z3LTl_tqgclOOcoHxMFjbfhKustETMdR7kVcS7O61-0TLR38XXmzpNndKnYkvZakd_8N2aUVYNUBumtAHcBioMUrlNMBwGnlc' },
@@ -17,73 +15,72 @@ export default function Surveillance() {
 
   return (
     <>
-      <TopBar title="Floor Surveillance Monitor" />
-      <div className="page-content surveillance-page">
+      <div className="flex flex-col gap-stack-lg mb-stack-lg">
         {/* Floor selector */}
-        <div className="surveillance-header">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-stack-lg gap-stack-md">
           <div>
-            <h2 className="text-headline-md text-on-surface">Floor Surveillance Monitor</h2>
-            <p className="text-body-sm text-on-surface-variant">Active Nodes: 24 | Connectivity: High-Bandwidth</p>
+            <h2 className="font-headline-md text-headline-md text-on-surface">Floor Surveillance Monitor</h2>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">Active Nodes: 24 | Connectivity: High-Bandwidth</p>
           </div>
-          <div className="surveillance-tabs">
+          <div className="flex gap-stack-sm items-center">
             {['Ground Floor', '1st Floor', '2nd Floor'].map((floor) => (
               <button
                 key={floor}
-                className={`floor-tab ${activeTab === floor ? 'neu-inset active' : 'neu-convex'}`}
+                className={`px-4 py-2 rounded-lg text-[12px] font-semibold transition-all duration-300 ${activeTab === floor ? 'neu-inset text-secondary' : 'neu-convex text-on-surface-variant hover:text-primary'}`}
                 onClick={() => setActiveTab(floor)}
               >
                 {floor}
               </button>
             ))}
-            <button className="neu-convex layout-btn">
+            <button className="flex items-center gap-stack-sm px-6 py-2 rounded-full text-[12px] font-semibold text-primary bg-surface-container ml-stack-md neu-convex hover:scale-105 active:scale-95 transition-transform">
               <Grid size={16} /> Layout
             </button>
           </div>
         </div>
 
         {/* Camera Grid */}
-        <div className="camera-grid">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(400px,1fr))] gap-stack-lg max-md:grid-cols-1">
           {cameras.map((cam) => (
-            <div key={cam.id} className="camera-card neu-convex">
-              <div className="camera-header">
-                <div className="camera-id">
-                  <Video size={16} className={cam.error ? 'text-error' : 'glow-cyan text-secondary'} />
-                  <span className="text-label-md font-bold">{cam.id}</span>
+            <div key={cam.id} className="bg-surface-container rounded-3xl p-stack-lg transition-transform duration-300 hover:scale-[1.02] neu-convex group">
+              <div className="flex justify-between items-center mb-stack-md">
+                <div className="flex items-center gap-stack-sm">
+                  <Video size={16} className={cam.error ? 'text-error' : 'glow-teal text-secondary'} />
+                  <span className="font-label-md text-label-md">{cam.id}</span>
                 </div>
-                <div className="camera-status">
-                  <span className={`status-badge ${cam.error ? 'status-offline' : 'status-live'}`}>
-                    {!cam.error && <div className="live-dot animate-pulse-glow" />}
+                <div className="flex items-center gap-stack-sm">
+                  <span className={`flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold ${cam.error ? 'bg-surface-variant text-outline-variant' : 'bg-error-container text-error'}`}>
+                    {!cam.error && <div className="w-1 h-1 rounded-full bg-error animate-pulse" />}
                     {cam.status}
                   </span>
-                  <span className="text-label-md text-outline" style={{ fontSize: '10px' }}>
+                  <span className="font-label-md text-label-md text-outline" style={{ fontSize: '10px' }}>
                     {cam.res} | {cam.fps} FPS
                   </span>
                 </div>
               </div>
 
-              <div className={`camera-viewport neu-inset ${cam.error ? 'viewport-error' : ''}`}>
+              <div className={`relative aspect-video rounded-xl bg-surface-container-lowest border mb-stack-md overflow-hidden ${cam.error ? 'border-error/20' : 'border-outline-variant/20 neu-inset'}`}>
                 {cam.error ? (
-                  <div className="camera-offline">
+                  <div className="flex flex-col items-center justify-center h-full gap-stack-sm">
                     <Video size={32} className="text-outline" />
-                    <p className="text-label-md text-outline">RECONNECTING...</p>
+                    <p className="font-label-md text-label-md text-outline">RECONNECTING...</p>
                   </div>
                 ) : (
                   <>
-                    <img src={cam.image} alt={cam.name} className="camera-feed" />
-                    <div className="camera-overlay"></div>
-                    <div className="camera-rec-badge">REC ●</div>
+                    <img src={cam.image} alt={cam.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                    <div className="absolute top-4 left-4 px-2 py-1 bg-black/40 backdrop-blur-md rounded-[4px] text-[10px] font-mono border border-white/10 text-white">REC ●</div>
                   </>
                 )}
               </div>
 
-              <div className="camera-controls">
-                <button className="cam-btn neu-convex" disabled={cam.error}>
+              <div className="flex gap-stack-sm">
+                <button className="flex-1 p-2 rounded-xl text-[11px] font-bold text-on-surface-variant flex items-center justify-center gap-1 transition-all duration-200 hover:text-primary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed neu-convex" disabled={cam.error}>
                   <Maximize size={14} /> EXPAND
                 </button>
-                <button className="cam-btn neu-convex" disabled={cam.error}>
+                <button className="flex-1 p-2 rounded-xl text-[11px] font-bold text-on-surface-variant flex items-center justify-center gap-1 transition-all duration-200 hover:text-primary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed neu-convex" disabled={cam.error}>
                   <Circle size={14} /> RECORD
                 </button>
-                <button className="cam-btn icon-only neu-convex" disabled={cam.error}>
+                <button className="flex-none px-4 py-2 rounded-xl text-[11px] font-bold text-on-surface-variant flex items-center justify-center gap-1 transition-all duration-200 hover:text-primary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed neu-convex" disabled={cam.error}>
                   <Camera size={16} />
                 </button>
               </div>
