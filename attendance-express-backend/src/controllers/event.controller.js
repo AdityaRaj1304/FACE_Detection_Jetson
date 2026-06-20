@@ -71,6 +71,35 @@ class EventController {
       next(error);
     }
   }
+
+  /**
+   * Proxy the live MJPEG video stream from Jetson Nano
+   */
+  async streamLiveFeed(req, res, next) {
+    try {
+      const { camera_id } = req.params;
+      const jetsonIp = process.env.JETSON_NANO_IP || '192.168.1.100';
+      const feedUrl = `http://${jetsonIp}:5000/video_feed/${camera_id}`;
+
+      logger.info(`Proxying video stream from ${feedUrl}`);
+
+      const axios = require('axios');
+      
+      const response = await axios({
+        method: 'get',
+        url: feedUrl,
+        responseType: 'stream'
+      });
+
+      // Forward the headers and stream
+      res.setHeader('Content-Type', response.headers['content-type'] || 'multipart/x-mixed-replace; boundary=frame');
+      response.data.pipe(res);
+
+    } catch (error) {
+      logger.error('Error proxying live feed:', error.message);
+      res.status(502).json({ success: false, error: 'Live feed unavailable or Jetson is offline.' });
+    }
+  }
 }
 
 module.exports = new EventController();
