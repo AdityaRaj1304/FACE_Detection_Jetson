@@ -72,18 +72,10 @@ class DeviceController {
         return res.status(404).json({ success: false, error: 'Device not found' });
       }
 
-      // Check for related attendance logs using the camera_id. 
-      // The camera_id in the logs maps to device_id in the Device model.
-      const logsCount = await prisma.attendanceLog.count({
+      // Cascade delete: Remove associated attendance logs first
+      await prisma.attendanceLog.deleteMany({
         where: { camera_id: parseInt(existing.device_id, 10) }
       });
-
-      if (logsCount > 0) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Cannot delete camera because it has associated attendance logs. Please disable it instead.' 
-        });
-      }
 
       await prisma.device.delete({
         where: { id }

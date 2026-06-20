@@ -464,13 +464,18 @@ def main(args):
     tiler.set_property("height", 720)
 
     nvvidconv = Gst.ElementFactory.make("nvvideoconvert", "convertor")
+    
+    capsfilter_rgba = Gst.ElementFactory.make("capsfilter", "capsfilter_rgba")
+    caps = Gst.Caps.from_string("video/x-raw(memory:NVMM), format=RGBA")
+    capsfilter_rgba.set_property("caps", caps)
+    
     nvosd = Gst.ElementFactory.make("nvdsosd", "onscreendisplay")
     transform = Gst.ElementFactory.make("nvegltransform", "nvegl-transform")
     sink = Gst.ElementFactory.make("nveglglessink", "nvvideo-renderer")
     sink.set_property('sync', False)
     sink.set_property('qos', False)
 
-    for elem in [pgie, tracker, sgie, tiler, nvvidconv, nvosd]:
+    for elem in [pgie, tracker, sgie, tiler, nvvidconv, capsfilter_rgba, nvosd]:
         pipeline.add(elem)
     if transform:
         pipeline.add(transform)
@@ -481,7 +486,8 @@ def main(args):
     tracker.link(sgie)
     sgie.link(tiler)
     tiler.link(nvvidconv)
-    nvvidconv.link(nvosd)
+    nvvidconv.link(capsfilter_rgba)
+    capsfilter_rgba.link(nvosd)
 
     if transform:
         nvosd.link(transform)
@@ -489,9 +495,9 @@ def main(args):
     else:
         nvosd.link(sink)
 
-    sgie_src_pad = sgie.get_static_pad("src")
-    if sgie_src_pad:
-        sgie_src_pad.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0)
+    osd_sink_pad = nvosd.get_static_pad("sink")
+    if osd_sink_pad:
+        osd_sink_pad.add_probe(Gst.PadProbeType.BUFFER, osd_sink_pad_buffer_probe, 0)
 
     loop = GLib.MainLoop()
     bus = pipeline.get_bus()
