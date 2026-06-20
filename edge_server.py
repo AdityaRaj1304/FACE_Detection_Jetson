@@ -38,13 +38,19 @@ def generate_mjpeg_stream(source_id):
         # Cap at roughly 20 FPS to save CPU
         time.sleep(0.05)
 
-@app.route('/video_feed_0')
-def video_feed_0():
-    return Response(generate_mjpeg_stream(0), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/video_feed_<camera_id>', strict_slashes=False)
+def video_feed(camera_id):
+    try:
+        # Sanitize camera_id to prevent path traversal
+        cid = int(camera_id)
+        return Response(generate_mjpeg_stream(cid), mimetype='multipart/x-mixed-replace; boundary=frame')
+    except ValueError:
+        return jsonify({"error": "Invalid camera ID"}), 400
 
-@app.route('/video_feed_1')
-def video_feed_1():
-    return Response(generate_mjpeg_stream(1), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/<path:path>')
+def catch_all(path):
+    logging.warning(f"404 Not Found: Received request for unknown path: /{path}")
+    return jsonify({"error": "Not Found", "path": path}), 404
 
 @app.route('/start-enroll', methods=['POST'])
 def start_enroll():

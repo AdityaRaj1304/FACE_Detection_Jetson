@@ -72,10 +72,17 @@ class DeviceController {
         return res.status(404).json({ success: false, error: 'Device not found' });
       }
 
-      // Cascade delete: Remove associated attendance logs first
-      await prisma.attendanceLog.deleteMany({
-        where: { camera_id: parseInt(existing.device_id, 10) }
-      });
+      // Check if device_id is a valid integer (since camera_id in logs is Int)
+      const camId = parseInt(existing.device_id, 10);
+      if (!isNaN(camId)) {
+        try {
+          await prisma.attendanceLog.deleteMany({
+            where: { camera_id: camId }
+          });
+        } catch (logErr) {
+          logger.warn(`Failed to delete associated logs for camera ${camId}: ${logErr.message}`);
+        }
+      }
 
       await prisma.device.delete({
         where: { id }
