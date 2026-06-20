@@ -316,7 +316,11 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
             nparray = pyds.get_nvds_buf_surface(hash(gst_buffer), frame_meta.batch_id)
             frame_copy = np.array(nparray, copy=True, order='C')
             frame_copy = cv2.cvtColor(frame_copy, cv2.COLOR_RGBA2BGR)
-            cv2.imwrite(f"/dev/shm/frame_{source_id}.jpg", frame_copy)
+            
+            import os
+            import tempfile
+            ram_disk = "/dev/shm" if os.name != 'nt' else tempfile.gettempdir()
+            cv2.imwrite(f"{ram_disk}/frame_{source_id}.jpg", frame_copy)
         except Exception as e:
             print(f"[VISION ERROR] ❌ Failed to save frame: {e}")
 

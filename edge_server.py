@@ -15,7 +15,10 @@ def generate_mjpeg_stream(source_id):
     Generator function that continuously reads the latest frame
     from the RAM disk and yields it as a multipart JPEG.
     """
-    file_path = f"/dev/shm/frame_{source_id}.jpg"
+    import tempfile
+    ram_disk = "/dev/shm" if os.name != 'nt' else tempfile.gettempdir()
+    file_path = f"{ram_disk}/frame_{source_id}.jpg"
+    
     while True:
         try:
             if os.path.exists(file_path):
