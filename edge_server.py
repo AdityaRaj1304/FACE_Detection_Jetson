@@ -63,8 +63,9 @@ def start_enroll():
     logging.info(f"Starting enrollment for student: {student_id}")
     
     try:
-        # Run enroll_trt.py asynchronously
-        subprocess.Popen(["python3", "enroll_trt.py", "--id", student_id])
+        # Run enroll_trt.py asynchronously using the same Python interpreter (venv)
+        import sys
+        subprocess.Popen([sys.executable, "enroll_trt.py", "--id", student_id])
         return jsonify({"status": "capturing"}), 200
     except Exception as e:
         logging.error(f"Failed to start enrollment: {e}")
