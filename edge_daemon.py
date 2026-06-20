@@ -317,10 +317,15 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
             frame_copy = np.array(nparray, copy=True, order='C')
             frame_copy = cv2.cvtColor(frame_copy, cv2.COLOR_RGBA2BGR)
             
-            import os
             import tempfile
             ram_disk = "/dev/shm" if os.name != 'nt' else tempfile.gettempdir()
-            cv2.imwrite(f"{ram_disk}/frame_{source_id}.jpg", frame_copy)
+            
+            temp_path = f"{ram_disk}/frame_{source_id}_tmp.jpg"
+            final_path = f"{ram_disk}/frame_{source_id}.jpg"
+            
+            # Atomic write: write to temp file then replace, preventing read/write tearing
+            cv2.imwrite(temp_path, frame_copy)
+            os.replace(temp_path, final_path)
         except Exception as e:
             print(f"[VISION ERROR] ❌ Failed to save frame: {e}")
 

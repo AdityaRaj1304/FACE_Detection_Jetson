@@ -83,17 +83,33 @@ class EventController {
 
       logger.info(`Proxying video stream from ${feedUrl}`);
 
-      const axios = require('axios');
+      const http = require('http');
       
-      const response = await axios({
-        method: 'get',
-        url: feedUrl,
-        responseType: 'stream'
+      const proxyReq = http.get(feedUrl, (proxyRes) => {
+        if (proxyRes.statusCode !== 200) {
+          logger.error(`Live feed proxy error: ${proxyRes.statusCode}`);
+          res.status(proxyRes.statusCode).end();
+          return;
+        }
+
+        res.writeHead(200, {
+          'Content-Type': proxyRes.headers['content-type'] || 'multipart/x-mixed-replace; boundary=frame',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'Pragma': 'no-cache'
+        });
+
+        proxyRes.pipe(res);
       });
 
-      // Forward the headers and stream
-      res.setHeader('Content-Type', response.headers['content-type'] || 'multipart/x-mixed-replace; boundary=frame');
-      response.data.pipe(res);
+      proxyReq.on('error', (e) => {
+        logger.error(`Error connecting to Jetson feed: ${e.message}`);
+        res.status(502).json({ success: false, error: 'Live feed unavailable or Jetson is offline.' });
+      });
+
+      req.on('close', () => {
+        proxyReq.abort();
+      });
 
     } catch (error) {
       logger.error('Error proxying live feed:', error.message);

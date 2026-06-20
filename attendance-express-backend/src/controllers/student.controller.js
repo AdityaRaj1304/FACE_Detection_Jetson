@@ -77,7 +77,7 @@ class StudentController {
       }
 
       const jetsonIp = process.env.JETSON_NANO_IP || '192.168.1.100';
-      const targetUrl = `http://${jetsonIp}:5000/start-enroll`;
+      const targetUrl = `http://${jetsonIp}:5001/start-enroll`;
 
       logger.info(`Triggering remote enrollment for student ${student_id} at ${targetUrl}`);
 
@@ -97,7 +97,7 @@ class StudentController {
       if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         return res.status(503).json({
           success: false,
-          error: `Jetson Nano edge device is unreachable at ${process.env.JETSON_NANO_IP}:5000. Is it online?`
+          error: `Jetson Nano edge device is unreachable at ${process.env.JETSON_NANO_IP}:5001. Is it online?`
         });
       }
 

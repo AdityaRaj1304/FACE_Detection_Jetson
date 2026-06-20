@@ -250,18 +250,10 @@ export default function Registration() {
                   <span className="text-white font-mono text-xs font-bold tracking-wider">CAM_0_ENTRANCE</span>
                 </div>
                 <img 
-                  src="http://localhost:3000/api/v1/events/feed/0" 
+                  src="http://192.168.1.7:5001/video_feed_0" 
                   alt="Live Feed 0"
                   className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                  }}
                 />
-                <div className="hidden absolute inset-0 flex items-center justify-center flex-col text-on-surface-variant/50">
-                  <Camera size={48} className="mb-2 opacity-50" />
-                  <p className="font-mono text-sm uppercase">Feed Offline</p>
-                </div>
               </div>
 
               {/* CAM 1 Feed */}
@@ -271,18 +263,10 @@ export default function Registration() {
                   <span className="text-white font-mono text-xs font-bold tracking-wider">CAM_1_EXIT</span>
                 </div>
                 <img 
-                  src="http://localhost:3000/api/v1/events/feed/1" 
+                  src="http://192.168.1.7:5001/video_feed_1" 
                   alt="Live Feed 1"
                   className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                    (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                  }}
                 />
-                <div className="hidden absolute inset-0 flex items-center justify-center flex-col text-on-surface-variant/50">
-                  <Camera size={48} className="mb-2 opacity-50" />
-                  <p className="font-mono text-sm uppercase">Feed Offline</p>
-                </div>
               </div>
             </div>
           </div>
