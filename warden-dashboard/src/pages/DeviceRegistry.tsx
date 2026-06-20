@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Network, Server, PlusCircle, CheckCircle, Activity, Box } from 'lucide-react';
+import { Network, Server, PlusCircle, CheckCircle, Activity, Box, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { TopBar } from '../components/TopBar';
 
@@ -57,6 +57,19 @@ export default function DeviceRegistry() {
       console.error(err.response?.data?.error || 'Failed to register device.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this hardware node?")) {
+      try {
+        const res = await axios.delete(`http://localhost:3000/api/v1/devices/${id}`);
+        if (res.data && res.data.success) {
+          setDevices(prev => prev.filter(device => device.id !== id));
+        }
+      } catch (err: any) {
+        alert(err.response?.data?.error || 'Failed to delete device.');
+      }
     }
   };
 
@@ -170,10 +183,19 @@ export default function DeviceRegistry() {
                           <span className={`px-2 py-1 rounded-[4px] text-[10px] font-bold tracking-widest ${device.role === 'IN' ? 'bg-secondary/20 text-secondary' : 'bg-error/20 text-error'}`}>
                             {device.role} GATE
                           </span>
-                          <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-on-surface uppercase">
-                            <div className="w-2 h-2 rounded-full bg-secondary drop-shadow-[0_0_4px_rgba(0,229,203,0.8)]"></div>
-                            {device.status}
-                          </span>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-on-surface uppercase">
+                              <div className="w-2 h-2 rounded-full bg-secondary drop-shadow-[0_0_4px_rgba(0,229,203,0.8)]"></div>
+                              {device.status}
+                            </span>
+                            <button
+                              onClick={() => handleDelete(device.id)}
+                              className="text-on-surface-variant hover:text-error transition-colors bg-surface-container-highest p-1.5 rounded-md hover:bg-error/10 active:scale-95"
+                              title="Delete Device"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div className="w-full bg-surface-container-highest rounded-full h-1 mt-auto">

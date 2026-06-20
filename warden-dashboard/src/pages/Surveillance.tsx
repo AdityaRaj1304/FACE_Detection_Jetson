@@ -89,10 +89,19 @@ export default function Surveillance() {
                 
                 <div className="relative aspect-video rounded-2xl bg-black border border-secondary/20 overflow-hidden shadow-[0_0_30px_rgba(0,229,203,0.1)]">
                   <img 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHqTQ0setz4xK_eQV4ZicNu4R2Af9ozzRHyuN8Eh1DJiHQJP-gLqvQnAnv5-iG_xu_2YGu-mlukSmnHRoa6Rv-ZopkzIEaFMj6CUSR_KkMsOsPipHKIHynswb4KMH2PT2hLdN0WvK22wokEqcWAnRf6EpueJx12u8B5UPcXUDuEphYAIO8nYhLFzyJx5LHwScPgnJ4ssomXChxCGSAuFGA5q9ZkxIF_KZNWJaFyrOrz2LNCOcZstxov0-rOd_GdVT7KnMvYNvdf90" 
+                    src="http://192.168.1.100:5001/video_feed_0" 
                     alt="Entry Gate" 
                     className="w-full h-full object-cover opacity-80" 
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                    }}
                   />
+                  <div className="hidden absolute inset-0 flex items-center justify-center flex-col text-on-surface-variant/50 bg-black/80 backdrop-blur-sm">
+                    <Camera size={48} className="mb-2 opacity-50" />
+                    <p className="font-mono text-sm uppercase font-bold tracking-widest">Feed Offline</p>
+                    <p className="font-mono text-[10px] mt-1 opacity-50">Check Jetson Connection</p>
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none"></div>
                   
                   {/* HUD Elements */}
@@ -135,10 +144,19 @@ export default function Surveillance() {
                 
                 <div className="relative aspect-video rounded-2xl bg-black border border-error/20 overflow-hidden shadow-[0_0_30px_rgba(255,50,50,0.1)]">
                   <img 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxbttdCcQZclp8B1CKZ_tzPHCO4DaiRPLXz4hnCStavd469UCWXWehmy8DfQ9pmWIs32RREXUTjeCfcT8sRSY0ruR9M3R2rRZRC2E29TVDHIaV3vCDDTj8cG1pnwVNDLrFKEKwQF1TXNYwizo1P7wO6izmmLcqWkQN3Z994coa24KHE7l9opuGtVNVqYOurLWzefrbBdHNQGHpWxfV6pkVihQFyjg0e-ZjqZ3xfmTjv_xMkePUkRKMoLFpz1Mjr1ZxP1LxuTnLvXw" 
+                    src="http://192.168.1.100:5001/video_feed_1" 
                     alt="Exit Gate" 
                     className="w-full h-full object-cover opacity-80" 
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                    }}
                   />
+                  <div className="hidden absolute inset-0 flex items-center justify-center flex-col text-on-surface-variant/50 bg-black/80 backdrop-blur-sm">
+                    <Camera size={48} className="mb-2 opacity-50" />
+                    <p className="font-mono text-sm uppercase font-bold tracking-widest">Feed Offline</p>
+                    <p className="font-mono text-[10px] mt-1 opacity-50">Check Jetson Connection</p>
+                  </div>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none"></div>
                   
                   {/* HUD Elements */}

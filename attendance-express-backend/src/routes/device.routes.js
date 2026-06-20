@@ -8,4 +8,7 @@ router.post('/', deviceController.registerDevice);
 // GET /api/v1/devices
 router.get('/', deviceController.getAllDevices);
 
+// DELETE /api/v1/devices/:id
+router.delete('/:id', deviceController.deleteDevice);
+
 module.exports = router;
