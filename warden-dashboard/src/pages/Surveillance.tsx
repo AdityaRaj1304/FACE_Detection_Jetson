@@ -89,7 +89,7 @@ export default function Surveillance() {
                 
                 <div className="relative aspect-video rounded-2xl bg-black border border-secondary/20 overflow-hidden shadow-[0_0_30px_rgba(0,229,203,0.1)]">
                   <img 
-                    src="http://192.168.1.100:5001/video_feed_0" 
+                    src="http://localhost:3000/api/v1/events/feed/0" 
                     alt="Entry Gate" 
                     className="w-full h-full object-cover opacity-80" 
                     onError={(e) => {
@@ -144,7 +144,7 @@ export default function Surveillance() {
                 
                 <div className="relative aspect-video rounded-2xl bg-black border border-error/20 overflow-hidden shadow-[0_0_30px_rgba(255,50,50,0.1)]">
                   <img 
-                    src="http://192.168.1.100:5001/video_feed_1" 
+                    src="http://localhost:3000/api/v1/events/feed/1" 
                     alt="Exit Gate" 
                     className="w-full h-full object-cover opacity-80" 
                     onError={(e) => {

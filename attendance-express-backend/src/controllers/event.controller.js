@@ -79,7 +79,7 @@ class EventController {
     try {
       const { camera_id } = req.params;
       const jetsonIp = process.env.JETSON_NANO_IP || '192.168.1.100';
-      const feedUrl = `http://${jetsonIp}:5000/video_feed/${camera_id}`;
+      const feedUrl = `http://${jetsonIp}:5001/video_feed_${camera_id}`;
 
       logger.info(`Proxying video stream from ${feedUrl}`);
 

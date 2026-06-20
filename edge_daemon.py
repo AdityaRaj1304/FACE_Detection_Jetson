@@ -19,6 +19,7 @@ import math
 import time
 import numpy as np
 import sqlite3
+import cv2
 
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst, GLib
@@ -309,6 +310,15 @@ def osd_sink_pad_buffer_probe(pad, info, u_data):
             ]
             for oid in stale_ids:
                 del track_id_cache[oid]
+
+        # Extract the image frame and save to RAM disk for the Flask stream
+        try:
+            nparray = pyds.get_nvds_buf_surface(hash(gst_buffer), frame_meta.batch_id)
+            frame_copy = np.array(nparray, copy=True, order='C')
+            frame_copy = cv2.cvtColor(frame_copy, cv2.COLOR_RGBA2BGR)
+            cv2.imwrite(f"/dev/shm/frame_{source_id}.jpg", frame_copy)
+        except Exception as e:
+            print(f"[VISION ERROR] ❌ Failed to save frame: {e}")
 
         try:
             l_frame = l_frame.next
