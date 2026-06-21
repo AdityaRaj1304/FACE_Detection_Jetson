@@ -66,12 +66,27 @@ export default function Registration() {
     
     setIsScanning(true);
     setEnrollmentStatus('scanning');
-    showToast('Biometric capture started on Jetson Nano. Please have the student face the camera.', 'info');
+    showToast('Scanning Multi-Angle Biometrics... Instruct student to look left, right, and center.', 'info');
 
     try {
       await axios.post('http://localhost:3000/api/v1/students/enroll-biometric', {
         student_id: formData.student_id
       });
+      
+      // Artificially delay UI success to match Jetson's 5-second capture loop
+      setTimeout(() => {
+        setEnrollmentStatus('success');
+        setIsScanning(false);
+        showToast('Multi-Angle Biometric Capture Complete.', 'success');
+        
+        // Auto-clear form for next student after a brief pause
+        setTimeout(() => {
+          setFormData({ full_name: '', student_id: '', room_number: '' });
+          setIsRegistered(false);
+          setEnrollmentStatus('idle');
+        }, 3000);
+      }, 6000);
+      
     } catch (err: any) {
       setIsScanning(false);
       setEnrollmentStatus('idle');
@@ -226,7 +241,7 @@ export default function Registration() {
                 )}
                 
                 {enrollmentStatus === 'scanning' ? (
-                  <><Cpu size={24} className="animate-pulse" /> SCANNING...</>
+                  <><Cpu size={24} className="animate-pulse" /> SCANNING MULTI-ANGLE BIOMETRICS...</>
                 ) : enrollmentStatus === 'success' ? (
                   <><CheckCircle size={24} /> ENROLLMENT COMPLETE</>
                 ) : (
