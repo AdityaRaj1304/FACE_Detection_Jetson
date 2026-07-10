@@ -1,18 +1,18 @@
 :root {
-  --text: #8B7355;
+  --text: #9B8875;
   --text-h: #2D2416;
   --bg: #FFFBF7;
-  --border: #FFE4CC;
-  --code-bg: #FFF0E6;
+  --border: #FFE8D9;
+  --code-bg: #FFF5EE;
   --accent: #FF8C42;
-  --accent-bg: rgba(255, 140, 66, 0.1);
-  --accent-border: rgba(255, 140, 66, 0.5);
-  --social-bg: rgba(255, 217, 179, 0.5);
+  --accent-bg: rgba(255, 140, 66, 0.08);
+  --accent-border: rgba(255, 140, 66, 0.3);
+  --social-bg: rgba(255, 237, 221, 0.4);
   --shadow:
-    rgba(139, 85, 42, 0.1) 0 10px 15px -3px, rgba(139, 85, 42, 0.05) 0 4px 6px -2px;
+    rgba(139, 85, 42, 0.06) 0 10px 15px -3px, rgba(139, 85, 42, 0.03) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
@@ -33,20 +33,20 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #D4B896;
-    --text-h: #FFE4CC;
+    --text-h: #FFE8D9;
     --bg: #3D3026;
     --border: #8B7355;
     --code-bg: #4A3D2E;
     --accent: #FFB74D;
-    --accent-bg: rgba(255, 183, 77, 0.15);
-    --accent-border: rgba(255, 183, 77, 0.5);
-    --social-bg: rgba(139, 85, 42, 0.5);
+    --accent-bg: rgba(255, 183, 77, 0.12);
+    --accent-border: rgba(255, 183, 77, 0.4);
+    --social-bg: rgba(139, 85, 42, 0.3);
     --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+      rgba(0, 0, 0, 0.3) 0 10px 15px -3px, rgba(0, 0, 0, 0.15) 0 4px 6px -2px;
   }
 
   #social .button-icon {
-    filter: invert(1) brightness(2);
+    filter: invert(1) brightness(1.2);
   }
 }
 
