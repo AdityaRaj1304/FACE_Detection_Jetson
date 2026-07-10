@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [showCard, setShowCard] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +23,12 @@ export const Login: React.FC = () => {
 
       {/* Main Authentication Card - Premium Liquid Glass */}
       <main className="w-full max-w-md px-margin-mobile relative z-10">
-        <form onSubmit={handleLogin} className="flex flex-col gap-stack-lg animate-in fade-in slide-in-from-bottom-8 duration-700">
+        {/* Login Card - Hidden by Default, Animated Entrance */}
+        <form onSubmit={handleLogin} className={`flex flex-col gap-stack-lg transition-all duration-700 ease-out ${
+          showCard 
+            ? 'opacity-100 scale-100 animate-in fade-in scale-in-95' 
+            : 'opacity-0 scale-95 hidden'
+        }`}>
           {/* Login Box - Premium Liquid Glass (Ultra-Transparent) */}
           <div className="relative backdrop-blur-[20px] bg-white/5 rounded-[40px] p-stack-lg flex flex-col gap-stack-md border border-white/20 shadow-2xl" style={{
             boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.25)',
@@ -94,7 +100,30 @@ export const Login: React.FC = () => {
             </div>
           </div>
         </form>
+
+        {/* Login Trigger Button - Shows when card is hidden */}
+        {!showCard && (
+          <button 
+            onClick={() => setShowCard(true)}
+            className="w-full h-16 backdrop-blur-sm bg-gradient-to-r from-white/15 to-white/10 rounded-3xl font-headline-md text-on-surface border border-white/25 hover:from-white/20 hover:to-white/15 active:scale-95 transition-all duration-300 flex items-center justify-center gap-stack-sm animate-in fade-in slide-in-from-bottom-4 duration-700"
+            style={{
+              boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.25)',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>lock_open</span>
+            <span className="font-bold">ACCESS SYSTEM</span>
+          </button>
+        )}
       </main>
+
+      {/* Close Card Overlay - Click to close card */}
+      {showCard && (
+        <div 
+          className="absolute inset-0 z-5"
+          onClick={() => setShowCard(false)}
+        />
+      )}
     </div>
   );
 };
