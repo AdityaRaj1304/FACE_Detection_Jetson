@@ -15,7 +15,11 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 glass-lg flex flex-col py-stack-lg gap-stack-md z-50">
       <div className="px-margin-desktop mb-stack-lg">
-        <h1 className="font-headline-md text-headline-md text-primary tracking-tighter">OneKByte Labs</h1>
+        <img 
+          alt="OneKByte Labs Logo" 
+          className="h-12 w-auto object-contain"
+          src="/front_onekbyte.png" 
+        />
         <div className="mt-stack-sm flex items-center gap-stack-sm">
           <div className="w-10 h-10 rounded-full glass-sm flex items-center justify-center overflow-hidden">
             <img 
