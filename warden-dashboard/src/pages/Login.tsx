@@ -62,10 +62,14 @@ export const Login: React.FC = () => {
     // Simulate authentication delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Mock authentication logic
-    const isValidCredentials = 
-      email === 'system_controller_01@onekbyte.com' && 
-      password === 'admin';
+    // // Mock authentication logic
+    // const isValidCredentials = 
+    //   email === 'system_controller_01@onekbyte.com' && 
+    //   password === 'admin';
+
+// Mock authentication logic
+    // TESTING MODE: accepts any non-empty email/password
+    const isValidCredentials = email.trim().length > 0 && password.trim().length > 0;
 
     if (isValidCredentials) {
       setStep('success');

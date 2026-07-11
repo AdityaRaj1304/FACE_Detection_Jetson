@@ -17,8 +17,8 @@ export const Sidebar: React.FC = () => {
       <div className="px-margin-desktop mb-stack-lg">
         <img 
           alt="OneKByte Labs Logo" 
-          className="h-12 w-auto object-contain"
-          src="/front_onekbyte.png" 
+          className="h-36 w-auto object-contain"
+          src="/newlogoonekbyte.png"
         />
         <div className="mt-stack-sm flex items-center gap-stack-sm">
           <div className="w-10 h-10 rounded-full glass-sm flex items-center justify-center overflow-hidden">
