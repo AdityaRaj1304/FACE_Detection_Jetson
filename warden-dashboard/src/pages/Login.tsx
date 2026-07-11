@@ -85,19 +85,19 @@ export const Login: React.FC = () => {
     }
   };
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.6, ease: 'easeOut' } },
     exit: { opacity: 0, transition: { duration: 0.4 } }
   };
 
-  const buttonVariants = {
+  const buttonVariants: any = {
     initial: { scale: 1, y: 0 },
     hover: { scale: 1.02, transition: { duration: 0.3, ease: 'easeOut' } },
     tap: { scale: 0.98 }
   };
 
-  const glassInputVariants = {
+  const glassInputVariants: any = {
     initial: { opacity: 0, scale: 0.9, y: 20 },
     animate: { 
       opacity: 1, 
@@ -116,24 +116,6 @@ export const Login: React.FC = () => {
       scale: 0.9, 
       y: -20, 
       transition: { duration: 0.3 } 
-    }
-  };
-
-  const shakeVariants = {
-    shake: {
-      x: [0, -10, 10, -10, 10, 0],
-      transition: { duration: 0.5, ease: 'easeInOut' }
-    }
-  };
-
-  const loadingPulse = {
-    animate: {
-      boxShadow: [
-        '0 0 20px rgba(255, 140, 66, 0.3)',
-        '0 0 40px rgba(255, 140, 66, 0.6)',
-        '0 0 20px rgba(255, 140, 66, 0.3)'
-      ],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' }
     }
   };
 

@@ -71,7 +71,7 @@ export const Sidebar: React.FC = () => {
           >
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>logout</span>
             <span className="font-label-md">Logout</span>
-          </button>
+          </NavLink>
         </div>
       </nav>
     </aside>
