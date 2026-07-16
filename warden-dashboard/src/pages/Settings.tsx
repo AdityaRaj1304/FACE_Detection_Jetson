@@ -109,7 +109,7 @@ export default function Settings() {
           reason: 'Simulated Manual Late Entry for Testing'
         };
         res = await axios.post('http://localhost:3000/api/v1/events/attendance/late-entry', payload, {
-          headers: { 'x-api-key': 'JETSON_DEV_KEY' }
+          headers: { 'x-api-key': import.meta.env.VITE_API_KEY }
         });
       } else {
         const payload = {
@@ -121,7 +121,7 @@ export default function Settings() {
           camera_id: simData.camera_id
         };
         res = await axios.post('http://localhost:3000/api/v1/events/attendance', payload, {
-          headers: { 'x-api-key': 'JETSON_DEV_KEY' }
+          headers: { 'x-api-key': import.meta.env.VITE_API_KEY }
         });
       }
       

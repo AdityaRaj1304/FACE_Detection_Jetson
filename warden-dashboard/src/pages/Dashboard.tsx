@@ -98,7 +98,7 @@ export default function Dashboard() {
         entryTime: today.toISOString(),
         reason: lateReason
       }, {
-        headers: { 'x-api-key': 'dev-secret-key' }
+        headers: { 'x-api-key': import.meta.env.VITE_API_KEY }
       });
 
       if (res.data?.success) {
