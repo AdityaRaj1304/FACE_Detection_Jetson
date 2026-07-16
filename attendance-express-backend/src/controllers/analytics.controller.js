@@ -153,10 +153,13 @@ class AnalyticsController {
 
   /**
    * GET /api/v1/analytics/occupancy
-   * Retrieves the list of students currently inside the hostel
+   * Retrieves the list of students currently inside or outside the hostel
+   * Query Param: status (IN | OUT) - Defaults to IN
    */
   async getCurrentOccupancy(req, res, next) {
     try {
+      const statusFilter = req.query.status === 'OUT' ? 'OUT' : 'IN';
+
       // Fetch all logs ordered by timestamp DESC
       const allLogs = await prisma.attendanceLog.findMany({
         orderBy: { timestamp: 'desc' },
@@ -169,22 +172,42 @@ class AnalyticsController {
         }
       });
 
-      const studentsInside = [];
-      latestLogsMap.forEach((log) => {
-        if (log.direction === 'IN') {
-          studentsInside.push({
-            student_id: log.student_id,
-            student_name: log.student_name,
-            entry_time: log.timestamp,
-            is_late: log.is_late
-          });
-        }
-      });
+      const targetStudents = [];
+      
+      if (statusFilter === 'IN') {
+        latestLogsMap.forEach((log) => {
+          if (log.direction === 'IN') {
+            targetStudents.push({
+              student_id: log.student_id,
+              student_name: log.student_name,
+              entry_time: log.timestamp,
+              is_late: log.is_late
+            });
+          }
+        });
+      } else {
+        // To find OUT students, we need to know all enrolled students.
+        const allStudents = await prisma.student.findMany();
+        
+        allStudents.forEach(student => {
+          const latestLog = latestLogsMap.get(student.student_id);
+          // They are outside if their latest log is OUT, or if they have NO logs at all
+          if (!latestLog || latestLog.direction === 'OUT') {
+            targetStudents.push({
+              student_id: student.student_id,
+              student_name: student.full_name,
+              entry_time: latestLog ? latestLog.timestamp : null, // When they left
+              is_late: false
+            });
+          }
+        });
+      }
 
       return res.status(200).json({
         success: true,
-        count: studentsInside.length,
-        data: studentsInside
+        count: targetStudents.length,
+        status: statusFilter,
+        data: targetStudents
       });
     } catch (error) {
       logger.error('Error getting current occupancy', error);
@@ -201,6 +224,10 @@ class AnalyticsController {
       // Clear existing
       await prisma.attendanceLog.deleteMany({});
       await prisma.student.deleteMany({});
+      
+      // Ensure devices exist
+      await prisma.device.upsert({where: {device_id: '0'}, update: {role: 'IN', name: 'Entrance Camera'}, create: {device_id: '0', role: 'IN', name: 'Entrance Camera'}});
+      await prisma.device.upsert({where: {device_id: '1'}, update: {role: 'OUT', name: 'Exit Camera'}, create: {device_id: '1', role: 'OUT', name: 'Exit Camera'}});
 
       const students = [
         { student_id: 'STU-101', full_name: 'John Doe', room_number: '101' },

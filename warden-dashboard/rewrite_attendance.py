@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import re
+
+content = """import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, AlertTriangle, Building, X, Plus, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import axios from 'axios';
 import { TopBar } from '../components/TopBar';
@@ -155,3 +157,8 @@ export default function Attendance() {
     </div>
   );
 }
+"""
+
+with open('/Users/adityakumarsingh/Documents/Face_Detection_Jetson/warden-dashboard/src/pages/Attendance.tsx', 'w') as f:
+    f.write(content)
+print("Attendance.tsx rewritten to fetch live logs based on selected date.")

@@ -1,4 +1,5 @@
-const TelegramBot = require('node-telegram-bot-api');
+const tgModule = require('node-telegram-bot-api');
+const TelegramBot = tgModule.TelegramBot || tgModule.default || tgModule;
 const logger = require('../utils/logger');
 
 class TelegramService {

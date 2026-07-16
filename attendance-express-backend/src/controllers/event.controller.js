@@ -73,6 +73,52 @@ class EventController {
   }
 
   /**
+   * Handle GET request for attendance by a specific date
+   */
+  async getAttendanceByDate(req, res, next) {
+    try {
+      const { date } = req.query;
+      if (!date) {
+        return res.status(400).json({ success: false, error: 'Query parameter date (YYYY-MM-DD) is required' });
+      }
+
+      // Construct start and end of the provided date
+      const targetDate = new Date(date);
+      if (isNaN(targetDate.getTime())) {
+        return res.status(400).json({ success: false, error: 'Invalid date format' });
+      }
+
+      const startOfDay = new Date(targetDate);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(targetDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+
+      const records = await prisma.attendanceLog.findMany({
+        where: {
+          timestamp: {
+            gte: startOfDay,
+            lte: endOfDay
+          }
+        },
+        orderBy: {
+          timestamp: 'desc'
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: records,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Proxy the live MJPEG video stream from Jetson Nano
    */
   async streamLiveFeed(req, res, next) {

@@ -10,6 +10,9 @@ router.post('/attendance', authenticateApiKey, eventController.receiveAttendance
 // GET /api/v1/events/attendance/today (Unprotected for dashboard)
 router.get('/attendance/today', eventController.getTodayAttendance);
 
+// GET /api/v1/events/attendance/date?date=YYYY-MM-DD
+router.get('/attendance/date', eventController.getAttendanceByDate);
+
 // POST /api/v1/events/attendance/late-entry (Manual override)
 router.post('/attendance/late-entry', authenticateApiKey, eventController.logLateEntry);
 

@@ -169,7 +169,7 @@ export default function Dashboard() {
             </div>
 
             <div 
-              onClick={() => navigate('/analytics')}
+              onClick={() => navigate('/analytics?filter=out')}
               className="glass-card rounded-3xl p-stack-md border-l-4 border-tertiary hover:-translate-y-1 transition-transform cursor-pointer"
             >
               <div className="flex items-center justify-between mb-unit">
