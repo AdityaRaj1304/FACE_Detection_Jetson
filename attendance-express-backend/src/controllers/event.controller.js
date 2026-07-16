@@ -73,6 +73,52 @@ class EventController {
   }
 
   /**
+   * Handle GET request for attendance by a specific date
+   */
+  async getAttendanceByDate(req, res, next) {
+    try {
+      const { date } = req.query;
+      if (!date) {
+        return res.status(400).json({ success: false, error: 'Query parameter date (YYYY-MM-DD) is required' });
+      }
+
+      // Construct start and end of the provided date
+      const targetDate = new Date(date);
+      if (isNaN(targetDate.getTime())) {
+        return res.status(400).json({ success: false, error: 'Invalid date format' });
+      }
+
+      const startOfDay = new Date(targetDate);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(targetDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+
+      const records = await prisma.attendanceLog.findMany({
+        where: {
+          timestamp: {
+            gte: startOfDay,
+            lte: endOfDay
+          }
+        },
+        orderBy: {
+          timestamp: 'desc'
+        }
+      });
+
+      return res.status(200).json({
+        success: true,
+        data: records,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
    * Proxy the live MJPEG video stream from Jetson Nano
    */
   async streamLiveFeed(req, res, next) {
@@ -114,6 +160,66 @@ class EventController {
     } catch (error) {
       logger.error('Error proxying live feed:', error.message);
       res.status(502).json({ success: false, error: 'Live feed unavailable or Jetson is offline.' });
+    }
+  }
+
+  /**
+   * Handle POST manual late entry from dashboard
+   */
+  async logLateEntry(req, res, next) {
+    try {
+      const { studentId, entryTime, reason } = req.body;
+
+      if (!studentId || !entryTime) {
+        return res.status(400).json({ success: false, error: 'Missing studentId or entryTime' });
+      }
+
+      // Convert local time string to Date object
+      const timestamp = new Date(entryTime);
+
+      // Save to database manually using Prisma since eventService.logAttendance is tied to camera logic
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+
+      // Check if student exists to get name
+      const student = await prisma.student.findUnique({
+        where: { student_id: studentId }
+      });
+
+      const record = await prisma.attendanceLog.create({
+        data: {
+          student_id: studentId,
+          student_name: student ? student.full_name : 'Unknown Student',
+          similarity_score: 1.0, // Manual override is absolute confidence
+          direction: 'IN', // Late entry implies they are entering
+          timestamp: timestamp,
+          is_late: true,
+          reason: reason || null
+        }
+      });
+
+      // Fire Telegram Alert asynchronously
+      const telegramService = require('../services/telegram.service');
+      telegramService.sendLateEntryAlert(studentId, entryTime, reason);
+
+      // Emit socket event so UI updates immediately
+      try {
+        const socketService = require('../services/socket.service');
+        const io = socketService.getIO();
+        io.emit('new_attendance', record);
+      } catch (err) {
+        logger.error('Could not emit new_attendance socket event.');
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: 'Late entry logged successfully',
+        data: record
+      });
+
+    } catch (error) {
+      logger.error('Error logging late entry:', error);
+      next(error);
     }
   }
 }

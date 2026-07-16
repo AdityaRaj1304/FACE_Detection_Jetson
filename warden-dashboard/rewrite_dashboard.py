@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import re
+with open('/Users/adityakumarsingh/Documents/Face_Detection_Jetson/warden-dashboard/src/pages/Dashboard.tsx', 'r') as f:
+    content = f.read()
+
+new_content = """import React, { useState, useEffect } from 'react';
 import { Users, Activity, Radio, ArrowUpRight, ArrowDownRight, Clock, Video, AlertCircle, Send, CheckCircle2 } from 'lucide-react';
 import axios from 'axios';
 import { io, Socket } from 'socket.io-client';
-import { useNavigate } from 'react-router-dom';
 import { TopBar } from '../components/TopBar';
 
 interface AttendanceLog {
@@ -25,7 +28,6 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const [logs, setLogs] = useState<AttendanceLog[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalEnrolled: 0,
@@ -157,10 +159,7 @@ export default function Dashboard() {
               <h3 className="font-headline-lg text-[36px] font-bold text-primary mt-2">{stats.totalEnrolled}</h3>
             </div>
             
-            <div 
-              onClick={() => navigate('/analytics')}
-              className="glass-card rounded-3xl p-stack-md border-l-4 border-secondary hover:-translate-y-1 transition-transform cursor-pointer"
-            >
+            <div className="glass-card rounded-3xl p-stack-md border-l-4 border-secondary hover:-translate-y-1 transition-transform">
               <div className="flex items-center justify-between mb-unit">
                 <p className="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Currently Inside</p>
                 <Activity size={20} className="text-secondary glow-orange" />
@@ -168,10 +167,7 @@ export default function Dashboard() {
               <h3 className="font-headline-lg text-[36px] font-bold text-secondary mt-2">{stats.currentlyInside}</h3>
             </div>
 
-            <div 
-              onClick={() => navigate('/analytics?filter=out')}
-              className="glass-card rounded-3xl p-stack-md border-l-4 border-tertiary hover:-translate-y-1 transition-transform cursor-pointer"
-            >
+            <div className="glass-card rounded-3xl p-stack-md border-l-4 border-tertiary hover:-translate-y-1 transition-transform">
               <div className="flex items-center justify-between mb-unit">
                 <p className="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Currently Outside</p>
                 <ArrowUpRight size={20} className="text-tertiary glow-orange" />
@@ -350,3 +346,9 @@ export default function Dashboard() {
     </div>
   );
 }
+"""
+
+with open('/Users/adityakumarsingh/Documents/Face_Detection_Jetson/warden-dashboard/src/pages/Dashboard.tsx', 'w') as f:
+    f.write(new_content)
+
+print("Dashboard.tsx rewritten successfully with main branch styles.")
